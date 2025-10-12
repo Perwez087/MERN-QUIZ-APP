@@ -16,8 +16,16 @@ database.connectToDB();
 app.use(express.json());
 app.use(cookieParser());
 
+const allowedOrigins = ['http://localhost:5173', 'https://mern-quiz-app-xi.vercel.app'];
+
 app.use(cors({
-  origin: ["http://localhost:5173", process.env.CORS_ORIGIN],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 
