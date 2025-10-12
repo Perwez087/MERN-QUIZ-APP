@@ -15,13 +15,19 @@ database.connectToDB();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-    maxAge: 14400,
-  })
-);
+
+const allowedOrigins = ['http://localhost:5173', 'https://e-commerce-ten-phi-60.vercel.app'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
 
 app.get("/", (req, res) => {
   res.json({
