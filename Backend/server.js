@@ -10,21 +10,18 @@ const database = require("./config/database");
 // ✅ Connect to DB
 database.connectToDB();
 
-// ✅ Middleware
 app.use(express.json());
 app.use(cookieParser());
 
 // ✅ Allowed origins
 const allowedOrigins = [
-  "http://localhost:5173",               // local frontend
-  "https://mern-quiz-app-xi.vercel.app" // deployed frontend
+  "http://localhost:5173",
+  "https://mern-quiz-app-xi.vercel.app"
 ];
 
-// ✅ CORS setup with preflight handling
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like Postman)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -32,13 +29,8 @@ app.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allow all methods
-    allowedHeaders: ["Content-Type", "Authorization"],    // allow these headers
   })
 );
-
-// ✅ Handle preflight requests
-app.options("*", cors());
 
 // ✅ Base route
 app.get("/", (req, res) => {
@@ -48,13 +40,13 @@ app.get("/", (req, res) => {
   });
 });
 
-// ✅ API routes
+// ✅ Routes
 app.use("/api/v1", routes);
 
-// ✅ Export for Vercel serverless
+// ✅ Export for Vercel (important)
 module.exports = app;
 
-// ✅ Run locally
+// ✅ Run locally only
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => {
