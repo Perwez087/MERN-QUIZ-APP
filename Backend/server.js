@@ -1,28 +1,30 @@
 const express = require("express");
 const app = express();
-require("dotenv").config();
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
+require("dotenv").config();
+
 const routes = require("./routes/routes");
+const cookieParser = require("cookie-parser");
 const database = require("./config/database");
 
-// Connect to DB
+// ✅ Connect to DB
 database.connectToDB();
 
-// Middleware
+// ✅ Middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// Allowed origins
+// ✅ Allowed origins
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://mern-quiz-app-xi.vercel.app"
+  "http://localhost:5173",               // local frontend
+  "https://mern-quiz-app-xi.vercel.app" // deployed frontend
 ];
 
-// CORS setup
+// ✅ CORS setup with preflight handling
 app.use(
   cors({
     origin: function (origin, callback) {
+      // allow requests with no origin (like Postman)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -30,32 +32,32 @@ app.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allow all methods
+    allowedHeaders: ["Content-Type", "Authorization"],    // allow these headers
   })
 );
 
-// ✅ Preflight OPTIONS handler
-app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", allowedOrigins.join(","));
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
-  res.sendStatus(200);
-});
+// ✅ Handle preflight requests
+app.options("*", cors());
 
-// Base route
+// ✅ Base route
 app.get("/", (req, res) => {
-  res.json({ success: true, message: "Server is running..." });
+  res.json({
+    success: true,
+    message: "Your server is up and running...",
+  });
 });
 
-// API routes
+// ✅ API routes
 app.use("/api/v1", routes);
 
-// Export for Vercel
+// ✅ Export for Vercel serverless
 module.exports = app;
 
-// Run locally only
+// ✅ Run locally
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`App is running on port ${PORT}`);
+  });
 }
