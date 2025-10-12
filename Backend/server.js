@@ -5,34 +5,34 @@ require("dotenv").config();
 
 const routes = require("./routes/routes");
 const cookieParser = require("cookie-parser");
-
 const database = require("./config/database");
 
-const PORT = process.env.PORT || 4000;
-
-// connect to db
+// ✅ Connect to DB
 database.connectToDB();
 
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = ['http://localhost:5173', 'https://mern-quiz-app-xi.vercel.app'];
+// ✅ Allowed origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://mern-quiz-app-xi.vercel.app" // <-- your frontend domain
+];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
-app.get('/', (req,res) =>{
-   res.send("Welcome")
-})
-
+// ✅ Base route
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -40,9 +40,16 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/v1/", routes);
+// ✅ Routes
+app.use("/api/v1", routes);
 
-// activate server
-app.listen(PORT, () => {
-  console.log(`App is running on port ${PORT}`);
-});
+// ✅ Export for Vercel (important)
+module.exports = app;
+
+// ✅ Run locally only
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`App is running on port ${PORT}`);
+  });
+}
