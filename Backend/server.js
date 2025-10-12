@@ -29,6 +29,10 @@ app.use(cors({
   credentials: true,
 }));
 
+app.get('/', (req,res) =>{
+   res.send("Welcome")
+})
+
 app.get("/", (req, res) => {
   res.json({
     success: true,
