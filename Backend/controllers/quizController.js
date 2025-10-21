@@ -148,8 +148,8 @@ exports.getQuizById = async (req, res) => {
 exports.attemptQuiz = async (req, res) => {
   try {
     const userId = req.user.id;
-    const quizId = req.params.id || req.body.quizId; // URL param preferred
-    const { answers } = req.body; // sirf answers body se
+    const quizId = req.params.id || req.body.quizId;
+    const { answers } = req.body;
 
     if (!answers || !Array.isArray(answers)) {
       return res.status(400).json({
@@ -167,21 +167,42 @@ exports.attemptQuiz = async (req, res) => {
 
     let score = 0;
     const answersArray = [];
+    const questionResults = []; // This will store detailed feedback
 
     for (const question of questions) {
       const userAnswer = answers.find(
         (ans) => ans.questionId === question._id.toString()
       );
+
+      // Find the selected option and correct option(s)
+      let selectedOptionObj = null;
+      let correctOptions = question.options.filter(opt => opt.isCorrect);
+
       if (userAnswer) {
-        const selectedOption = question.options.id(userAnswer.selectedOption);
-        if (selectedOption && selectedOption.isCorrect) {
+        selectedOptionObj = question.options.id(userAnswer.selectedOption);
+        if (selectedOptionObj && selectedOptionObj.isCorrect) {
           score += 1;
         }
+
         answersArray.push({
           questionId: question._id,
           selectedOption: userAnswer.selectedOption,
         });
       }
+
+      questionResults.push({
+        questionId: question._id,
+        questionText: question.questionText,
+        options: question.options.map(opt => ({
+          id: opt._id,
+          text: opt.text,
+          isCorrect: opt.isCorrect
+        })),
+        selectedOption: selectedOptionObj
+          ? { id: selectedOptionObj._id, text: selectedOptionObj.text }
+          : null,
+        correctOptions: correctOptions.map(opt => ({ id: opt._id, text: opt.text }))
+      });
     }
 
     const attempt = new Attempt({
@@ -203,6 +224,7 @@ exports.attemptQuiz = async (req, res) => {
       success: true,
       message: "Quiz attempted successfully",
       score,
+      results: questionResults, // <-- Return detailed per-question feedback
     });
   } catch (e) {
     console.error("ERROR ATTEMPTING QUIZ:", e.message);
@@ -212,6 +234,7 @@ exports.attemptQuiz = async (req, res) => {
     });
   }
 };
+
 
 
 // ✅

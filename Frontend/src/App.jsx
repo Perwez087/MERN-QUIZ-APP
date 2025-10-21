@@ -12,6 +12,7 @@ import CreateQuiz from "./pages/CreateQuiz"
 import CreateQuestions from "./pages/CreateQuestions"
 import AdminQuizes from "./pages/AdminQuizes"
 import { useSelector } from "react-redux"
+import DetailedResults from "./pages/DetailedResults"
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/" element={<LoggedInRoutes><Home /></LoggedInRoutes>} />
           <Route path="/quiz/:id" element={<LoggedInRoutes><AttemptQuiz /></LoggedInRoutes>} />
           <Route path="/quiz-results" element={<LoggedInRoutes><QuizResults /></LoggedInRoutes>} />
+          <Route path="/detailed-results" element={<LoggedInRoutes><DetailedResults /></LoggedInRoutes>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard">

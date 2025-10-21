@@ -1,19 +1,52 @@
+// src/pages/QuizResult.jsx
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Button from '../components/Button';
 
 const QuizResults = () => {
     const location = useLocation();
-    const { score, total } = location.state || { score: 0 };
     const navigate = useNavigate();
 
-    return (
-        <div className='min-h-[80vh] flex flex-col gap-5 justify-center items-center'>
-            <div className='text-center'>
-                <h1 className='text-3xl border-b border-slate-600 pb-5'>Quiz Results</h1>
-                <p className='text-2xl mt-4 flex items-center gap-3 font-thin'>Your Score: <span className='font-semibold'><span className={`${score / total >= 0.4 ? "text-green-500" : "text-red-700"} `}>{score}</span> / {total}</span> </p>
+    // safe destructure - if user opened page directly, state might be undefined
+    const { score, total, results } = location.state || {};
+
+    // If results missing, show message and optionally go back
+    if (!results) {
+        return (
+            <div className='min-h-[90vh] py-10 px-5'>
+                <h2 className='text-2xl font-bold mb-3'>Results not found</h2>
+                <p className='mb-4'>Either the quiz was not submitted properly or you opened this page directly.</p>
+                <button
+                    onClick={() => navigate(-1)}
+                    className='py-2 px-4 bg-blue-600 rounded-lg text-white'
+                >
+                    Go Back
+                </button>
             </div>
-            <Button className='w-max' onClick={() => navigate("/")}>Back to Home</Button>
+        );
+    }
+
+    return (
+        <div className='min-h-[90vh] py-10 px-5'>
+            <h2 className='text-3xl font-bold mb-5'>Your Score</h2>
+            <div className='mb-6'>
+                <p className='text-xl'>You scored <span className='font-semibold'>{score}</span> out of <span className='font-semibold'>{total}</span></p>
+            </div>
+
+            <div className='flex gap-3'>
+                <button
+                    onClick={() => navigate('/detailed-results', { state: { results, score, total } })}
+                    className='py-2 px-4 bg-green-600 rounded-lg text-white'
+                >
+                    View Detailed Answers
+                </button>
+
+                <button
+                    onClick={() => navigate('/')}
+                    className='py-2 px-4 bg-slate-700 rounded-lg text-white'
+                >
+                    Go Home
+                </button>
+            </div>
         </div>
     );
 };
